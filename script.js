@@ -15,7 +15,7 @@ const sizes = {
 const scene = new THREE.Scene()
 
 /**
- * Fog (Haunted House Lesson)
+ * Fog
  */
 const fog = new THREE.Fog('#0a0a0a', 1, 15)
 scene.fog = fog
@@ -50,7 +50,7 @@ controls.enableDamping = true
 const textureLoader = new THREE.TextureLoader()
 
 /**
- * Ground (same concept as Haunted House floor)
+ * Ground
  */
 const grassColor = textureLoader.load('/textures/grass/color.jpg')
 const grassAO = textureLoader.load('/textures/grass/ambientOcclusion.jpg')
@@ -156,7 +156,7 @@ chairLog.receiveShadow = true
 scene.add(chairLog)
 
 /**
- * Lights (from Lights Lesson + Haunted House)
+ * Lights
  */
 
 // Ambient Light
@@ -181,7 +181,7 @@ reflectionLight.position.set(0, 1, 0.8)
 scene.add(reflectionLight)
 
 /**
- * Shadows Optimization (from Shadows Lesson)
+ * Shadows Optimization
  */
 moonLight.shadow.mapSize.width = 512
 moonLight.shadow.mapSize.height = 512
@@ -256,7 +256,7 @@ window.addEventListener('resize', () =>
 })
 
 /**
- * Animation (Fire Flicker — same logic as Ghosts)
+ * Animation
  */
 const clock = new THREE.Clock()
 const tick = () =>
