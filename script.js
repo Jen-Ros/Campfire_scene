@@ -245,7 +245,7 @@ groundReflection.shadow.camera.near = 0.05
 groundReflection.shadow.camera.far = 4
 
 /**
- * Pine Trees Around the Camp
+ * Pine Trees Around the Camp - Randomized on each load
  */
 const trees = new THREE.Group()
 scene.add(trees)
@@ -262,47 +262,76 @@ const treeLeavesMaterial = new THREE.MeshStandardMaterial({
     metalness: 0.0
 })
 
-for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2
-    const radius = 6 + Math.random() * 1.5 
-    const x = Math.cos(angle) * radius
-    const z = Math.sin(angle) * radius
-
-    // Tree trunk
-    const trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.15, 0.15, 1, 8),
-        treeTrunkMaterial
-    )
-    trunk.position.set(x, 0.5, z)
+// Helper function to create a random pine tree
+function createRandomTree(baseX, baseZ, scale = 1) {
+    const treeGroup = new THREE.Group()
+    
+    // Random trunk height and radius
+    const trunkHeight = 0.8 + Math.random() * 0.6
+    const trunkRadius = 0.12 + Math.random() * 0.08
+    const trunkGeometry = new THREE.CylinderGeometry(trunkRadius, trunkRadius, trunkHeight, 8)
+    const trunk = new THREE.Mesh(trunkGeometry, treeTrunkMaterial)
+    trunk.position.set(0, trunkHeight / 2, 0)
     trunk.castShadow = true
     trunk.receiveShadow = true
+    treeGroup.add(trunk)
+    
+    // Variable number of leaves layers (2-5 layers)
+    const numLayers = Math.floor(2 + Math.random() * 4)
+    let leavesY = trunkHeight + 0.3
+    
+    for (let i = 0; i < numLayers; i++) {
+        const layerScale = 1 - (i * 0.2) // Each layer gets smaller
+        const radius = (0.6 + Math.random() * 0.4) * layerScale * scale
+        const height = (1.0 + Math.random() * 0.5) * layerScale * scale
+        
+        const leaves = new THREE.Mesh(
+            new THREE.ConeGeometry(radius, height, 8),
+            treeLeavesMaterial
+        )
+        leaves.position.y = leavesY
+        leavesY += height * 0.8
+        leaves.castShadow = true
+        leaves.receiveShadow = true
+        treeGroup.add(leaves)
+    }
+    
+    // Random rotation around Y axis
+    treeGroup.rotation.y = Math.random() * Math.PI * 2
+    
+    // Random scale variation
+    const treeScale = 0.8 + Math.random() * 0.4
+    treeGroup.scale.set(treeScale, treeScale, treeScale)
+    
+    return treeGroup
+}
 
-    // Tree leaves 
-    const leaves1 = new THREE.Mesh(
-        new THREE.ConeGeometry(0.8, 1.5, 8),
-        treeLeavesMaterial
-    )
-    leaves1.position.set(x, 1.5, z)
-    leaves1.castShadow = true
-    leaves1.receiveShadow = true
+// Generate random trees in a circle around the camp
+const numTrees = 18 + Math.floor(Math.random() * 12) // 18-30 trees
+for (let i = 0; i < numTrees; i++) {
+    // Random angle
+    const angle = Math.random() * Math.PI * 2
+    // Random distance from center (camp is at 0,0 but offset, fire is at 0,0)
+    const radius = 5.5 + Math.random() * 4
+    const x = Math.cos(angle) * radius
+    const z = Math.sin(angle) * radius
+    
+    const tree = createRandomTree(x, z)
+    tree.position.set(x, 0, z)
+    trees.add(tree)
+}
 
-    const leaves2 = new THREE.Mesh(
-        new THREE.ConeGeometry(0.6, 1.2, 8),
-        treeLeavesMaterial
-    )
-    leaves2.position.set(x, 2.2, z)
-    leaves2.castShadow = true
-    leaves2.receiveShadow = true
-
-    const leaves3 = new THREE.Mesh(
-        new THREE.ConeGeometry(0.4, 0.8, 8),
-        treeLeavesMaterial
-    )
-    leaves3.position.set(x, 2.7, z)
-    leaves3.castShadow = true
-    leaves3.receiveShadow = true
-
-    trees.add(trunk, leaves1, leaves2, leaves3)
+// Add some extra scattered trees in random positions
+const extraTrees = 5 + Math.floor(Math.random() * 5) // 5-10 extra trees
+for (let i = 0; i < extraTrees; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const radius = 6 + Math.random() * 2
+    const x = Math.cos(angle) * radius
+    const z = Math.sin(angle) * radius
+    
+    const tree = createRandomTree(x, z)
+    tree.position.set(x, 0, z)
+    trees.add(tree)
 }
 
 /**
@@ -421,6 +450,46 @@ helpersFolder.add(guiParams, 'showHelpers').onChange(value => {
     fireLight1Helper.visible = value
     moonLightHelper.visible = value
 })
+
+// Function to regenerate trees
+function regenerateTrees() {
+    // Clear all existing trees
+    while(trees.children.length > 0) {
+        trees.remove(trees.children[0])
+    }
+    
+    // Generate new random trees in a circle around the camp
+    const numTrees = 18 + Math.floor(Math.random() * 12) // 18-30 trees
+    for (let i = 0; i < numTrees; i++) {
+        // Random angle
+        const angle = Math.random() * Math.PI * 2
+        // Random distance from center
+        const radius = 5.5 + Math.random() * 4
+        const x = Math.cos(angle) * radius
+        const z = Math.sin(angle) * radius
+        
+        const tree = createRandomTree(x, z)
+        tree.position.set(x, 0, z)
+        trees.add(tree)
+    }
+    
+    // Add some extra scattered trees in random positions
+    const extraTrees = 5 + Math.floor(Math.random() * 5) // 5-10 extra trees
+    for (let i = 0; i < extraTrees; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const radius = 6 + Math.random() * 2
+        const x = Math.cos(angle) * radius
+        const z = Math.sin(angle) * radius
+        
+        const tree = createRandomTree(x, z)
+        tree.position.set(x, 0, z)
+        trees.add(tree)
+    }
+}
+
+// Scene controls folder
+const sceneFolder = gui.addFolder('Scene Controls')
+sceneFolder.add({ regenerateTrees }, 'regenerateTrees').name('🌲 Regenerate Trees')
 
 gui.close() // Start with GUI closed
 
