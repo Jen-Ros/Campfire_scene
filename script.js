@@ -440,9 +440,6 @@ cameraFolder.add(guiParams, 'cameraY', 0, 10).onChange(value => {
 cameraFolder.add(guiParams, 'cameraZ', -10, 10).onChange(value => {
     camera.position.z = value
 })
-cameraFolder.add(guiParams, 'cameraX', -10, 10).listen()
-cameraFolder.add(guiParams, 'cameraY', 0, 10).listen()
-cameraFolder.add(guiParams, 'cameraZ', -10, 10).listen()
 
 // Helpers folder
 const helpersFolder = gui.addFolder('Debug Helpers')
